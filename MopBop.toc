@@ -1,9 +1,9 @@
 ## Interface: 40300
-## Title : MopBop
-## Notes: Base for new WoW addons
+## Title: MopBop - Hunter DPS Optimizer
+## Notes: Optimizes hunter DPS by suggesting the next 3 spells to cast based on damage, cooldowns, and talents
 ## Author: Don Hanson
 ## Version: 1.0
 ## Dependencies: 
-## SavedVariablesPerCharacter: NewAddonPrefs
+## SavedVariablesPerCharacter: MopBopPrefs
 
 MopBop.lua
