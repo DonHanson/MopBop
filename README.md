@@ -24,14 +24,17 @@ A comprehensive World of Warcraft Classic Mists of Pandaria addon that optimizes
 - **Target Health**: Adapts rotation for execute phase (Kill Shot below 20% HP)
 
 ### User-Friendly Interface
-- **Clean Display**: Shows next 3 optimal spells with damage values and cooldowns
+- **Spell Icon Display**: Shows next 3 optimal spells as icons with numbers
+- **Horizontal Layout**: Icons arranged left-to-right (1st, 2nd, 3rd priority)
 - **Color Coding**: 
-  - 🟢 Green: Ready to cast
-  - 🟠 Orange: On cooldown
-  - ⚫ Gray: Unavailable
-- **Status Bar**: Current focus, target health, and pet status
+  - 🟢 Green border: Ready to cast
+  - 🟠 Orange border: On cooldown
+  - ⚫ Gray border: Unavailable
+- **Cooldown Overlays**: Visual cooldown indicators on spell icons
+- **Tooltips**: Hover over icons for spell details
+- **Status Bar**: Current focus, target health, specialization, and pet status
 - **Draggable Frame**: Move anywhere on screen
-- **Customizable**: Toggle display options and colors
+- **Configuration UI**: Easy spec selection with dropdown menu
 
 ## 📦 Installation
 
@@ -49,6 +52,7 @@ A comprehensive World of Warcraft Classic Mists of Pandaria addon that optimizes
 - `/mopbop` or `/hunterdps` - Show help and available commands
 - `/mopbop hide` - Hide the addon interface
 - `/mopbop show` - Show the addon interface
+- `/mopbop config` - Open configuration window
 - `/mopbop reset` - Reset position to center of screen
 
 ### Interface Controls
@@ -59,19 +63,35 @@ A comprehensive World of Warcraft Classic Mists of Pandaria addon that optimizes
 ### Understanding the Display
 ```
 Hunter DPS Optimizer
-1. Kill Shot (2500 dmg)
-2. Chimera Shot (1800 dmg) (9s)
-3. Aimed Shot (2000 dmg)
-Focus: 85 | Target HP: 15.2% | Pet: Alive
+[1] [2] [3]  (Spell icons with numbers)
+Focus: 85 | Target HP: 15.2% | Spec: Survival | Pet: Alive
 ```
+
+The addon displays three spell icons horizontally:
+- **Left icon (1)**: Next spell to cast
+- **Middle icon (2)**: Second spell to cast  
+- **Right icon (3)**: Third spell to cast
+
+Icons show cooldown overlays and color-coded borders:
+- 🟢 Green border: Ready to cast
+- 🟠 Orange border: On cooldown
+- ⚫ Gray border: Unavailable
 
 ## 🔧 Configuration
 
+### Configuration Window
+Use `/mopbop config` to open the configuration window where you can:
+- **Select Hunter Specialization**: Choose between Survival, Marksmanship, and Beast Mastery
+- **Default Selection**: Survival is selected by default
+- **Persistence**: Your selection is saved between game sessions
+
+### Automatic Settings
 The addon automatically saves your preferences including:
 - Frame position and size
 - Display options (damage values, cooldowns)
 - Color schemes
 - Visibility settings
+- Selected specialization
 
 ## 📊 Supported Spells
 

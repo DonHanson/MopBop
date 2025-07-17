@@ -32,15 +32,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automatic damage calculation adjustments
 
 - **User Interface**
-  - Clean, modern display showing next 3 optimal spells
-  - Color-coded spell availability (green/orange/gray)
+  - Spell icon display showing next 3 optimal spells horizontally
+  - Color-coded borders for spell availability (green/orange/gray)
+  - Cooldown overlays on spell icons
+  - Tooltips for spell details on hover
   - Draggable frame with customizable position
-  - Status bar showing focus, target health, and pet status
-  - Right-click options menu
+  - Status bar showing focus, target health, specialization, and pet status
+  - Configuration window with spec selection dropdown
 
 - **Slash Commands**
   - `/mopbop` and `/hunterdps` for help
   - `/mopbop hide/show` for visibility control
+  - `/mopbop config` for configuration window
   - `/mopbop reset` for position reset
 
 - **Event System**
@@ -51,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Configuration System**
   - Persistent settings storage
+  - Hunter specialization selection with dropdown
   - Customizable display options
   - Color scheme preferences
   - Frame positioning and sizing
