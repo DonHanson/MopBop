@@ -5,6 +5,13 @@ MopBop = {};
 MopBop.fully_loaded = false;
 MopBop.version = "1.0";
 
+-- Hunter specializations
+MopBop.specs = {
+    "Survival",
+    "Marksmanship", 
+    "Beast Mastery"
+};
+
 -- Default configuration
 MopBop.default_options = {
     -- UI positioning
@@ -15,13 +22,16 @@ MopBop.default_options = {
     
     -- UI sizing
     frameW = 300,
-    frameH = 150,
+    frameH = 100,
     
     -- Display options
     showCooldowns = true,
     showDamage = true,
     showTalents = true,
     showPetCommands = true,
+    
+    -- Spec selection
+    selectedSpec = "Survival",
     
     -- Colors
     colorReady = {0, 1, 0, 1},      -- Green for ready spells
@@ -42,7 +52,8 @@ MopBop.spells = {
         priority = 1,
         requires = {},
         talents = {},
-        notes = "Basic filler shot"
+        notes = "Basic filler shot",
+        spec = "All"
     },
     
     ["Arcane Shot"] = {
@@ -54,7 +65,8 @@ MopBop.spells = {
         priority = 2,
         requires = {},
         talents = {"Improved Arcane Shot"},
-        notes = "Instant shot, good focus dump"
+        notes = "Instant shot, good focus dump",
+        spec = "All"
     },
     
     ["Kill Shot"] = {
@@ -66,7 +78,8 @@ MopBop.spells = {
         priority = 10,
         requires = {"target_hp_below_20"},
         talents = {},
-        notes = "Execute ability, use below 20% HP"
+        notes = "Execute ability, use below 20% HP",
+        spec = "All"
     },
     
     -- Marksmanship abilities
@@ -79,7 +92,8 @@ MopBop.spells = {
         priority = 3,
         requires = {},
         talents = {"Improved Aimed Shot", "Careful Aim"},
-        notes = "High damage, long cast time"
+        notes = "High damage, long cast time",
+        spec = "Marksmanship"
     },
     
     ["Chimera Shot"] = {
@@ -91,7 +105,8 @@ MopBop.spells = {
         priority = 4,
         requires = {},
         talents = {"Improved Chimera Shot"},
-        notes = "Strong instant shot with cooldown"
+        notes = "Strong instant shot with cooldown",
+        spec = "Marksmanship"
     },
     
     ["Multi-Shot"] = {
@@ -103,7 +118,8 @@ MopBop.spells = {
         priority = 5,
         requires = {"multiple_targets"},
         talents = {},
-        notes = "AOE ability"
+        notes = "AOE ability",
+        spec = "Marksmanship"
     },
     
     -- Survival abilities
@@ -116,7 +132,8 @@ MopBop.spells = {
         priority = 6,
         requires = {},
         talents = {"Improved Explosive Shot"},
-        notes = "DoT ability with cooldown"
+        notes = "DoT ability with cooldown",
+        spec = "Survival"
     },
     
     ["Black Arrow"] = {
@@ -128,7 +145,8 @@ MopBop.spells = {
         priority = 7,
         requires = {},
         talents = {},
-        notes = "DoT ability, long cooldown"
+        notes = "DoT ability, long cooldown",
+        spec = "Survival"
     },
     
     -- Beast Mastery abilities
@@ -141,7 +159,8 @@ MopBop.spells = {
         priority = 8,
         requires = {"pet_alive"},
         talents = {"Improved Kill Command"},
-        notes = "Pet damage ability"
+        notes = "Pet damage ability",
+        spec = "Beast Mastery"
     },
     
     ["Bestial Wrath"] = {
@@ -153,7 +172,8 @@ MopBop.spells = {
         priority = 9,
         requires = {"pet_alive"},
         talents = {},
-        notes = "Pet damage buff"
+        notes = "Pet damage buff",
+        spec = "Beast Mastery"
     },
     
     -- Utility abilities
@@ -166,7 +186,8 @@ MopBop.spells = {
         priority = 11,
         requires = {},
         talents = {},
-        notes = "Haste buff"
+        notes = "Haste buff",
+        spec = "All"
     },
     
     ["Readiness"] = {
@@ -178,7 +199,8 @@ MopBop.spells = {
         priority = 12,
         requires = {},
         talents = {},
-        notes = "Reset cooldowns"
+        notes = "Reset cooldowns",
+        spec = "All"
     }
 };
 
@@ -203,6 +225,7 @@ function MopBop.OnReady()
     end
     
     MopBop.CreateUIFrame();
+    MopBop.CreateConfigFrame();
     MopBop.InitializeSpellTracking();
 end
 
@@ -317,6 +340,11 @@ end
 function MopBop.GetSpellPriority(spellName, spellData)
     local priority = spellData.priority;
     
+    -- Check if spell is available for current spec
+    if spellData.spec ~= "All" and spellData.spec ~= _G.MopBopPrefs.selectedSpec then
+        return -1; -- Not available for current spec
+    end
+    
     -- Check if spell is available
     if not MopBop.IsSpellAvailable(spellName, spellData) then
         return -1; -- Not available
@@ -400,7 +428,8 @@ function MopBop.GetOptimalSpells()
                 damage = effective_damage,
                 cooldown = spellData.cooldown,
                 focus = spellData.focus,
-                notes = spellData.notes
+                notes = spellData.notes,
+                id = spellData.id
             });
         end
     end
@@ -453,26 +482,122 @@ function MopBop.CreateUIFrame()
     -- Title
     MopBop.Title = MopBop.Cover:CreateFontString(nil, "OVERLAY");
     MopBop.Title:SetPoint("TOP", MopBop.UIFrame, "TOP", 0, -5);
-    MopBop.Title:SetFont([[Fonts\FRIZQT__.TTF]], 14, "OUTLINE");
+    MopBop.Title:SetFont([[Fonts\FRIZQT__.TTF]], 12, "OUTLINE");
     MopBop.Title:SetText("Hunter DPS Optimizer");
     MopBop.Title:SetTextColor(1, 1, 1, 1);
     
-    -- Spell suggestions
-    MopBop.SpellLabels = {};
+    -- Spell icon containers
+    MopBop.SpellIcons = {};
+    local iconSize = 40;
+    local spacing = 10;
+    local totalWidth = (iconSize * 3) + (spacing * 2);
+    local startX = (_G.MopBopPrefs.frameW - totalWidth) / 2;
+    
     for i = 1, 3 do
-        MopBop.SpellLabels[i] = MopBop.Cover:CreateFontString(nil, "OVERLAY");
-        MopBop.SpellLabels[i]:SetPoint("TOPLEFT", MopBop.UIFrame, "TOPLEFT", 10, -25 - (i-1)*25);
-        MopBop.SpellLabels[i]:SetFont([[Fonts\FRIZQT__.TTF]], 12, "OUTLINE");
-        MopBop.SpellLabels[i]:SetText("");
-        MopBop.SpellLabels[i]:SetTextColor(1, 1, 1, 1);
+        -- Create icon frame
+        MopBop.SpellIcons[i] = CreateFrame("Button", nil, MopBop.Cover);
+        MopBop.SpellIcons[i]:SetSize(iconSize, iconSize);
+        MopBop.SpellIcons[i]:SetPoint("TOP", MopBop.UIFrame, "TOP", startX + (i-1)*(iconSize + spacing), -25);
+        
+        -- Icon texture
+        MopBop.SpellIcons[i].icon = MopBop.SpellIcons[i]:CreateTexture(nil, "ARTWORK");
+        MopBop.SpellIcons[i].icon:SetAllPoints();
+        MopBop.SpellIcons[i].icon:SetTexCoord(0.1, 0.9, 0.1, 0.9);
+        
+        -- Cooldown frame
+        MopBop.SpellIcons[i].cooldown = CreateFrame("Cooldown", nil, MopBop.SpellIcons[i], "CooldownFrameTemplate");
+        MopBop.SpellIcons[i].cooldown:SetAllPoints();
+        
+        -- Border
+        MopBop.SpellIcons[i].border = MopBop.SpellIcons[i]:CreateTexture(nil, "OVERLAY");
+        MopBop.SpellIcons[i].border:SetPoint("TOPLEFT", -2, 2);
+        MopBop.SpellIcons[i].border:SetPoint("BOTTOMRIGHT", 2, -2);
+        MopBop.SpellIcons[i].border:SetTexture(1, 1, 1, 0.8);
+        
+        -- Number label
+        MopBop.SpellIcons[i].number = MopBop.SpellIcons[i]:CreateFontString(nil, "OVERLAY");
+        MopBop.SpellIcons[i].number:SetPoint("TOPLEFT", 2, -2);
+        MopBop.SpellIcons[i].number:SetFont([[Fonts\FRIZQT__.TTF]], 10, "OUTLINE");
+        MopBop.SpellIcons[i].number:SetText(tostring(i));
+        MopBop.SpellIcons[i].number:SetTextColor(1, 1, 1, 1);
+        
+        -- Tooltip
+        MopBop.SpellIcons[i]:SetScript("OnEnter", function(self)
+            if self.spellName then
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+                GameTooltip:SetSpellByID(self.spellId);
+                GameTooltip:Show();
+            end
+        end);
+        
+        MopBop.SpellIcons[i]:SetScript("OnLeave", function(self)
+            GameTooltip:Hide();
+        end);
     end
     
     -- Status info
     MopBop.StatusLabel = MopBop.Cover:CreateFontString(nil, "OVERLAY");
-    MopBop.StatusLabel:SetPoint("BOTTOMLEFT", MopBop.UIFrame, "BOTTOMLEFT", 10, 5);
+    MopBop.StatusLabel:SetPoint("BOTTOM", MopBop.UIFrame, "BOTTOM", 0, 5);
     MopBop.StatusLabel:SetFont([[Fonts\FRIZQT__.TTF]], 10, "OUTLINE");
     MopBop.StatusLabel:SetText("");
     MopBop.StatusLabel:SetTextColor(0.8, 0.8, 0.8, 1);
+end
+
+function MopBop.CreateConfigFrame()
+    -- Create configuration frame
+    MopBop.ConfigFrame = CreateFrame("Frame", "MopBopConfigFrame", UIParent, "BasicFrameTemplateWithInset");
+    MopBop.ConfigFrame:SetSize(300, 200);
+    MopBop.ConfigFrame:SetPoint("CENTER");
+    MopBop.ConfigFrame:SetMovable(true);
+    MopBop.ConfigFrame:EnableMouse(true);
+    MopBop.ConfigFrame:RegisterForDrag("LeftButton");
+    MopBop.ConfigFrame:SetScript("OnDragStart", MopBop.ConfigFrame.StartMoving);
+    MopBop.ConfigFrame:SetScript("OnDragStop", MopBop.ConfigFrame.StopMovingOrSizing);
+    MopBop.ConfigFrame:Hide();
+    
+    -- Title
+    MopBop.ConfigFrame.title = MopBop.ConfigFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+    MopBop.ConfigFrame.title:SetPoint("TOP", MopBop.ConfigFrame, "TOP", 0, -5);
+    MopBop.ConfigFrame.title:SetText("MopBop Configuration");
+    
+    -- Spec selection label
+    MopBop.ConfigFrame.specLabel = MopBop.ConfigFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    MopBop.ConfigFrame.specLabel:SetPoint("TOPLEFT", MopBop.ConfigFrame, "TOPLEFT", 20, -40);
+    MopBop.ConfigFrame.specLabel:SetText("Hunter Specialization:");
+    
+    -- Spec dropdown
+    MopBop.ConfigFrame.specDropdown = CreateFrame("Frame", "MopBopSpecDropdown", MopBop.ConfigFrame, "UIDropDownMenuTemplate");
+    MopBop.ConfigFrame.specDropdown:SetPoint("TOPLEFT", MopBop.ConfigFrame.specLabel, "BOTTOMLEFT", -20, -5);
+    
+    UIDropDownMenu_SetWidth(MopBop.ConfigFrame.specDropdown, 150);
+    UIDropDownMenu_Initialize(MopBop.ConfigFrame.specDropdown, MopBop.InitializeSpecDropdown);
+    
+    -- Close button
+    MopBop.ConfigFrame.closeButton = CreateFrame("Button", nil, MopBop.ConfigFrame, "GameMenuButtonTemplate");
+    MopBop.ConfigFrame.closeButton:SetSize(80, 25);
+    MopBop.ConfigFrame.closeButton:SetPoint("BOTTOM", MopBop.ConfigFrame, "BOTTOM", 0, 15);
+    MopBop.ConfigFrame.closeButton:SetText("Close");
+    MopBop.ConfigFrame.closeButton:SetScript("OnClick", function()
+        MopBop.ConfigFrame:Hide();
+    end);
+end
+
+function MopBop.InitializeSpecDropdown(self, level)
+    local info = UIDropDownMenu_CreateInfo();
+    
+    for i, spec in ipairs(MopBop.specs) do
+        info.text = spec;
+        info.value = spec;
+        info.func = MopBop.OnSpecSelected;
+        info.checked = (_G.MopBopPrefs.selectedSpec == spec);
+        UIDropDownMenu_AddButton(info);
+    end
+end
+
+function MopBop.OnSpecSelected(self, arg1, arg2, checked)
+    _G.MopBopPrefs.selectedSpec = self.value;
+    UIDropDownMenu_SetSelectedValue(MopBop.ConfigFrame.specDropdown, self.value);
+    UIDropDownMenu_SetText(MopBop.ConfigFrame.specDropdown, self.value);
 end
 
 function MopBop.OnDragStart(frame)
@@ -516,31 +641,43 @@ function MopBop.UpdateFrame()
     -- Get optimal spells
     local optimal_spells = MopBop.GetOptimalSpells();
     
-    -- Update spell labels
+    -- Update spell icons
     for i = 1, 3 do
         if optimal_spells[i] then
             local spell = optimal_spells[i];
+            local spellData = MopBop.spells[spell.name];
+            
+            -- Set icon texture
+            local icon = GetSpellTexture(spell.id);
+            MopBop.SpellIcons[i].icon:SetTexture(icon);
+            
+            -- Set spell info for tooltip
+            MopBop.SpellIcons[i].spellName = spell.name;
+            MopBop.SpellIcons[i].spellId = spell.id;
+            
+            -- Set cooldown
+            if spellData.cooldown > 0 and MopBop.spell_cooldowns[spell.name] then
+                local start, duration = MopBop.spell_cooldowns[spell.name] - spellData.cooldown, spellData.cooldown;
+                MopBop.SpellIcons[i].cooldown:SetCooldown(start, duration);
+            else
+                MopBop.SpellIcons[i].cooldown:Hide();
+            end
+            
+            -- Set border color based on availability
             local color = MopBop.GetSpellColor(spell.name);
-            local text = string.format("%d. %s", i, spell.name);
+            MopBop.SpellIcons[i].border:SetVertexColor(unpack(color));
             
-            if _G.MopBopPrefs.showDamage then
-                text = text .. string.format(" (%d dmg)", spell.damage);
-            end
-            
-            if _G.MopBopPrefs.showCooldowns and spell.cooldown > 0 then
-                text = text .. string.format(" (%ds)", spell.cooldown);
-            end
-            
-            MopBop.SpellLabels[i]:SetText(text);
-            MopBop.SpellLabels[i]:SetTextColor(unpack(color));
+            -- Show the icon
+            MopBop.SpellIcons[i]:Show();
         else
-            MopBop.SpellLabels[i]:SetText("");
+            -- Hide the icon if no spell
+            MopBop.SpellIcons[i]:Hide();
         end
     end
     
     -- Update status
-    local status_text = string.format("Focus: %d | Target HP: %.1f%%", 
-        MopBop.player_focus, MopBop.target_hp);
+    local status_text = string.format("Focus: %d | Target HP: %.1f%% | Spec: %s", 
+        MopBop.player_focus, MopBop.target_hp, _G.MopBopPrefs.selectedSpec);
     
     if not MopBop.pet_alive then
         status_text = status_text .. " | Pet: Dead";
@@ -585,12 +722,17 @@ SlashCmdList["MOPBOP"] = function(msg)
     elseif msg == "show" then
         MopBopPrefs.hide = false;
         MopBop.UIFrame:Show();
+    elseif msg == "config" then
+        MopBop.ConfigFrame:Show();
+        UIDropDownMenu_SetSelectedValue(MopBop.ConfigFrame.specDropdown, _G.MopBopPrefs.selectedSpec);
+        UIDropDownMenu_SetText(MopBop.ConfigFrame.specDropdown, _G.MopBopPrefs.selectedSpec);
     elseif msg == "reset" then
         MopBop.UIFrame:SetPoint("CENTER", 0, 0);
     else
         print("MopBop - Hunter DPS Optimizer");
         print("/mopbop hide - Hide the addon");
         print("/mopbop show - Show the addon");
+        print("/mopbop config - Open configuration");
         print("/mopbop reset - Reset position");
     end
 end;
