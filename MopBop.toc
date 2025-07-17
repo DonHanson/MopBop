@@ -1,0 +1,9 @@
+## Interface: 40300
+## Title : MopBop
+## Notes: Base for new WoW addons
+## Author: Don Hanson
+## Version: 1.0
+## Dependencies: 
+## SavedVariablesPerCharacter: NewAddonPrefs
+
+MopBop.lua
