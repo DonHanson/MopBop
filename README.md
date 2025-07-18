@@ -24,15 +24,15 @@ A comprehensive World of Warcraft Classic Mists of Pandaria addon that optimizes
 - **Target Health**: Adapts rotation for execute phase (Kill Shot below 20% HP)
 
 ### User-Friendly Interface
-- **Spell Icon Display**: Shows next 3 optimal spells as icons with numbers
+- **Minimal Spell Icon Display**: Shows next 3 optimal spells as clean icons
 - **Horizontal Layout**: Icons arranged left-to-right (1st, 2nd, 3rd priority)
-- **Color Coding**: 
+- **Subtle Color Coding**: 
   - 🟢 Green border: Ready to cast
   - 🟠 Orange border: On cooldown
   - ⚫ Gray border: Unavailable
 - **Cooldown Overlays**: Visual cooldown indicators on spell icons
 - **Tooltips**: Hover over icons for spell details
-- **Status Bar**: Current focus, target health, specialization, and pet status
+- **Clean Design**: No text elements for unobtrusive experience
 - **Draggable Frame**: Move anywhere on screen
 - **Configuration UI**: Easy spec selection with dropdown menu
 
@@ -62,20 +62,20 @@ A comprehensive World of Warcraft Classic Mists of Pandaria addon that optimizes
 
 ### Understanding the Display
 ```
-Hunter DPS Optimizer
-[1] [2] [3]  (Spell icons with numbers)
-Focus: 85 | Target HP: 15.2% | Spec: Survival | Pet: Alive
+[Spell Icon] [Spell Icon] [Spell Icon]
 ```
 
-The addon displays three spell icons horizontally:
-- **Left icon (1)**: Next spell to cast
-- **Middle icon (2)**: Second spell to cast  
-- **Right icon (3)**: Third spell to cast
+The addon displays three spell icons horizontally in a clean, minimal interface:
+- **Left icon**: Next spell to cast (highest priority)
+- **Middle icon**: Second spell to cast  
+- **Right icon**: Third spell to cast
 
-Icons show cooldown overlays and color-coded borders:
+Icons show cooldown overlays and subtle color-coded borders:
 - 🟢 Green border: Ready to cast
 - 🟠 Orange border: On cooldown
 - ⚫ Gray border: Unavailable
+
+**Note**: The UI is intentionally minimal with no text elements for a clean, unobtrusive experience.
 
 ## 🔧 Configuration
 

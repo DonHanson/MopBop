@@ -32,12 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automatic damage calculation adjustments
 
 - **User Interface**
-  - Spell icon display showing next 3 optimal spells horizontally
-  - Color-coded borders for spell availability (green/orange/gray)
+  - Minimal spell icon display showing next 3 optimal spells horizontally
+  - Subtle color-coded borders for spell availability (green/orange/gray)
   - Cooldown overlays on spell icons
   - Tooltips for spell details on hover
+  - Clean design with no text elements for unobtrusive experience
   - Draggable frame with customizable position
-  - Status bar showing focus, target health, specialization, and pet status
   - Configuration window with spec selection dropdown
 
 - **Slash Commands**
