@@ -21,8 +21,8 @@ MopBop.default_options = {
     hide = false,
     
     -- UI sizing
-    frameW = 300,
-    frameH = 100,
+    frameW = 150,
+    frameH = 50,
     
     -- Display options
     showCooldowns = true,
@@ -448,16 +448,16 @@ function MopBop.CreateUIFrame()
     MopBop.UIFrame:SetWidth(_G.MopBopPrefs.frameW);
     MopBop.UIFrame:SetHeight(_G.MopBopPrefs.frameH);
     
-    -- Background
+    -- Background - make it more transparent to match the image
     MopBop.UIFrame.texture = MopBop.UIFrame:CreateTexture();
     MopBop.UIFrame.texture:SetAllPoints(MopBop.UIFrame);
-    MopBop.UIFrame.texture:SetTexture(unpack(_G.MopBopPrefs.colorBackground));
+    MopBop.UIFrame.texture:SetTexture(0, 0, 0, 0.3); -- More transparent background
     
-    -- Border
-    MopBop.UIFrame.border = MopBop.UIFrame:CreateTexture();
-    MopBop.UIFrame.border:SetPoint("TOPLEFT", -1, 1);
-    MopBop.UIFrame.border:SetPoint("BOTTOMRIGHT", 1, -1);
-    MopBop.UIFrame.border:SetTexture(1, 1, 1, 0.3);
+    -- Remove border for cleaner look
+    -- MopBop.UIFrame.border = MopBop.UIFrame:CreateTexture();
+    -- MopBop.UIFrame.border:SetPoint("TOPLEFT", -1, 1);
+    -- MopBop.UIFrame.border:SetPoint("BOTTOMRIGHT", 1, -1);
+    -- MopBop.UIFrame.border:SetTexture(1, 1, 1, 0.3);
     
     -- Position
     MopBop.UIFrame:SetPoint(_G.MopBopPrefs.frameRef, _G.MopBopPrefs.frameX, _G.MopBopPrefs.frameY);
@@ -479,25 +479,26 @@ function MopBop.CreateUIFrame()
     MopBop.Cover:SetScript("OnDragStop", MopBop.OnDragStop);
     MopBop.Cover:SetScript("OnClick", MopBop.OnClick);
     
-    -- Title
-    MopBop.Title = MopBop.Cover:CreateFontString(nil, "OVERLAY");
-    MopBop.Title:SetPoint("TOP", MopBop.UIFrame, "TOP", 0, -5);
-    MopBop.Title:SetFont([[Fonts\FRIZQT__.TTF]], 12, "OUTLINE");
-    MopBop.Title:SetText("Hunter DPS Optimizer");
-    MopBop.Title:SetTextColor(1, 1, 1, 1);
+    -- Remove title for cleaner look
+    -- MopBop.Title = MopBop.Cover:CreateFontString(nil, "OVERLAY");
+    -- MopBop.Title:SetPoint("TOP", MopBop.UIFrame, "TOP", 0, -5);
+    -- MopBop.Title:SetFont([[Fonts\FRIZQT__.TTF]], 12, "OUTLINE");
+    -- MopBop.Title:SetText("Hunter DPS Optimizer");
+    -- MopBop.Title:SetTextColor(1, 1, 1, 1);
     
-    -- Spell icon containers
+    -- Spell icon containers - center them vertically and horizontally
     MopBop.SpellIcons = {};
     local iconSize = 40;
     local spacing = 10;
     local totalWidth = (iconSize * 3) + (spacing * 2);
     local startX = (_G.MopBopPrefs.frameW - totalWidth) / 2;
+    local startY = (_G.MopBopPrefs.frameH - iconSize) / 2; -- Center vertically
     
     for i = 1, 3 do
         -- Create icon frame
         MopBop.SpellIcons[i] = CreateFrame("Button", nil, MopBop.Cover);
         MopBop.SpellIcons[i]:SetSize(iconSize, iconSize);
-        MopBop.SpellIcons[i]:SetPoint("TOP", MopBop.UIFrame, "TOP", startX + (i-1)*(iconSize + spacing), -25);
+        MopBop.SpellIcons[i]:SetPoint("CENTER", MopBop.UIFrame, "CENTER", startX + (i-1)*(iconSize + spacing) - totalWidth/2 + iconSize/2, 0);
         
         -- Icon texture
         MopBop.SpellIcons[i].icon = MopBop.SpellIcons[i]:CreateTexture(nil, "ARTWORK");
@@ -508,18 +509,18 @@ function MopBop.CreateUIFrame()
         MopBop.SpellIcons[i].cooldown = CreateFrame("Cooldown", nil, MopBop.SpellIcons[i], "CooldownFrameTemplate");
         MopBop.SpellIcons[i].cooldown:SetAllPoints();
         
-        -- Border
+        -- Border - make it more subtle like in the image
         MopBop.SpellIcons[i].border = MopBop.SpellIcons[i]:CreateTexture(nil, "OVERLAY");
-        MopBop.SpellIcons[i].border:SetPoint("TOPLEFT", -2, 2);
-        MopBop.SpellIcons[i].border:SetPoint("BOTTOMRIGHT", 2, -2);
-        MopBop.SpellIcons[i].border:SetTexture(1, 1, 1, 0.8);
+        MopBop.SpellIcons[i].border:SetPoint("TOPLEFT", -1, 1);
+        MopBop.SpellIcons[i].border:SetPoint("BOTTOMRIGHT", 1, -1);
+        MopBop.SpellIcons[i].border:SetTexture(1, 1, 1, 0.6); -- More subtle border
         
-        -- Number label
-        MopBop.SpellIcons[i].number = MopBop.SpellIcons[i]:CreateFontString(nil, "OVERLAY");
-        MopBop.SpellIcons[i].number:SetPoint("TOPLEFT", 2, -2);
-        MopBop.SpellIcons[i].number:SetFont([[Fonts\FRIZQT__.TTF]], 10, "OUTLINE");
-        MopBop.SpellIcons[i].number:SetText(tostring(i));
-        MopBop.SpellIcons[i].number:SetTextColor(1, 1, 1, 1);
+        -- Remove number labels for cleaner look
+        -- MopBop.SpellIcons[i].number = MopBop.SpellIcons[i]:CreateFontString(nil, "OVERLAY");
+        -- MopBop.SpellIcons[i].number:SetPoint("TOPLEFT", 2, -2);
+        -- MopBop.SpellIcons[i].number:SetFont([[Fonts\FRIZQT__.TTF]], 10, "OUTLINE");
+        -- MopBop.SpellIcons[i].number:SetText(tostring(i));
+        -- MopBop.SpellIcons[i].number:SetTextColor(1, 1, 1, 1);
         
         -- Tooltip
         MopBop.SpellIcons[i]:SetScript("OnEnter", function(self)
@@ -535,12 +536,12 @@ function MopBop.CreateUIFrame()
         end);
     end
     
-    -- Status info
-    MopBop.StatusLabel = MopBop.Cover:CreateFontString(nil, "OVERLAY");
-    MopBop.StatusLabel:SetPoint("BOTTOM", MopBop.UIFrame, "BOTTOM", 0, 5);
-    MopBop.StatusLabel:SetFont([[Fonts\FRIZQT__.TTF]], 10, "OUTLINE");
-    MopBop.StatusLabel:SetText("");
-    MopBop.StatusLabel:SetTextColor(0.8, 0.8, 0.8, 1);
+    -- Remove status info for cleaner look
+    -- MopBop.StatusLabel = MopBop.Cover:CreateFontString(nil, "OVERLAY");
+    -- MopBop.StatusLabel:SetPoint("BOTTOM", MopBop.UIFrame, "BOTTOM", 0, 5);
+    -- MopBop.StatusLabel:SetFont([[Fonts\FRIZQT__.TTF]], 10, "OUTLINE");
+    -- MopBop.StatusLabel:SetText("");
+    -- MopBop.StatusLabel:SetTextColor(0.8, 0.8, 0.8, 1);
 end
 
 function MopBop.CreateConfigFrame()
@@ -683,7 +684,7 @@ function MopBop.UpdateFrame()
         status_text = status_text .. " | Pet: Dead";
     end
     
-    MopBop.StatusLabel:SetText(status_text);
+    -- MopBop.StatusLabel:SetText(status_text); -- Removed status label
 end
 
 function MopBop.GetSpellColor(spellName)
